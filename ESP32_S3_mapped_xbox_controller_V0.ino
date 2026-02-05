@@ -15,7 +15,7 @@
 //PIN CONNECTIONS
 
 int ledPin1 = 20; //green LED A-button
-int ledPin2 = 21; //red LED B-button
+int ledPin2 = 19; //red LED B-button
 int ENApin = 4; // motor 1 speed
 int IN1pin = 5; // motor 1 dir1
 int IN2pin = 6; // motor 1 dir2
@@ -101,6 +101,14 @@ void processGamepad(ControllerPtr ctl) {
   // By query each button individually:
   //  a(), b(), x(), y(), l1(), etc...
  
+
+  //== XBOX no buttons = 0x000 ==//
+  if (ctl->buttons() == 0x0000) {
+    // code for when A button is pushed
+    digitalWrite(ledPin1, LOW);
+    digitalWrite(ledPin2, LOW);
+  }
+
   //== XBOX A button = 0x0001 ==//
   if (ctl->buttons() == 0x0001) {
     // code for when A button is pushed
@@ -108,7 +116,6 @@ void processGamepad(ControllerPtr ctl) {
   }
   if (ctl->buttons() != 0x0001) {
     // code for when A button is released
-    digitalWrite(ledPin1, LOW);
   }
 
   //== XBOX B button = 0x0002 ==//
@@ -118,7 +125,16 @@ void processGamepad(ControllerPtr ctl) {
   }
   if (ctl->buttons() != 0x0002) {
     // code for when B button is released
-     digitalWrite(ledPin2, LOW);
+  }
+
+  //== XBOX A&B button = 0x0003 ==//
+  if (ctl->buttons() == 0x0003) {
+    // code for when A button is pushed
+    digitalWrite(ledPin1, HIGH);
+    digitalWrite(ledPin2, HIGH);
+  }
+  if (ctl->buttons() != 0x0003) {
+    // code for when A button is released
   }
 
   //== XBOX X button = 0x0004 ==//
@@ -204,7 +220,7 @@ void processGamepad(ControllerPtr ctl) {
   //== LEFT JOYSTICK - UP ==//  Foward movement!
   if (ctl->axisY() <= -25) {
     // code for when left joystick is pushed up
-    int motorspeed = map(ctl->axisY(), -25, -512, 70, 255);
+    int motorSpeed = map(ctl->axisY(), -25, -512, 70, 255);
     digitalWrite(IN1pin, HIGH);
     digitalWrite(IN2pin, LOW);
     digitalWrite(IN3pin, HIGH);
@@ -216,7 +232,7 @@ void processGamepad(ControllerPtr ctl) {
   //== LEFT JOYSTICK - DOWN ==// Reverse!!
   if (ctl->axisY() >= 25) {
     // code for when left joystick is pushed down
-    int motorspeed = map(ctl->axisY(), 25, 511, 70, 255);
+    int motorSpeed = map(ctl->axisY(), 25, 511, 70, 255);
     digitalWrite(IN1pin, LOW);
     digitalWrite(IN2pin, HIGH);
     digitalWrite(IN3pin, LOW);
@@ -228,7 +244,7 @@ void processGamepad(ControllerPtr ctl) {
   //== LEFT JOYSTICK - LEFT ==//  Strafe Left
   if (ctl->axisX() <= -25) {
     // code for when left joystick is pushed left
-    int motorspeed = map(ctl->axisX(), -25, -512, 70, 255);
+    int motorSpeed = map(ctl->axisX(), -25, -512, 70, 255);
     digitalWrite(IN1pin, LOW);
     digitalWrite(IN2pin, LOW);
     digitalWrite(IN3pin, HIGH);
@@ -240,12 +256,12 @@ void processGamepad(ControllerPtr ctl) {
   //== LEFT JOYSTICK - RIGHT ==//  Strafe Right
   if (ctl->axisX() >= 25) {
     // code for when left joystick is pushed right
-    int motorspeed = map(ctl->axisX(), 25, 511, 70, 255);
+    int motorSpeed = map(ctl->axisX(), 25, 511, 70, 255);
     digitalWrite(IN1pin, HIGH);
     digitalWrite(IN2pin, LOW);
     digitalWrite(IN3pin, LOW);
     digitalWrite(IN4pin, LOW);
-    digitalWrite(ENApin, motorspeed);
+    digitalWrite(ENApin, motorSpeed);
     digitalWrite(ENBpin, 0);
   }
 
@@ -259,14 +275,14 @@ void processGamepad(ControllerPtr ctl) {
   //== RIGHT JOYSTICK - X AXIS ==//  Servo Arm!
   if (ctl->axisRX()) {
     // code for when right joystick moves along x-axis
-    int servoPos = map(axisRX(), -512, 511, 0, 180);
+    int servoPos = map(ctl->axisRX(), -512, 511, 0, 180);
     xServo.write(servoPos);
   }
 
   //== RIGHT JOYSTICK - Y AXIS ==//
   if (ctl->axisRY()) {
   // code for when right joystick moves along y-axis
-    int servoPos = map(axisRY(), -512, 511, 0, 180);
+    int servoPos = map(ctl->axisRY(), -512, 511, 0, 180);
     xServo.write(servoPos);
   }
   dumpGamepad(ctl);
