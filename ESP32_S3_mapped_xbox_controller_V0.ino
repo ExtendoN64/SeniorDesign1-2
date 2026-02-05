@@ -1,4 +1,12 @@
 //still need to add more motors and need to set up for mecanum wheels.
+//Creator: GENE
+//Project: ARIES
+//Date:2/5/2026
+//Board: ESP32-S3
+//About: A basic code to map xbox controller buttons for functions.
+
+//Ripped from https://www.youtube.com/watch?v=Laa93Wj7f-I
+//Orginal Code: https://racheldebarros.com/connect-your-game-controller-to-an-esp32/
 
 #include <Bluepad32.h>
 #include <ESP32Sero.h>
