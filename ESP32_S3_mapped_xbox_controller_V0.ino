@@ -4,6 +4,7 @@
 //Date:2/5/2026
 //Board: ESP32-S3
 //About: A basic code to map xbox controller buttons for functions.
+//Edit: updating pins-2/5/2026
 
 //Ripped from https://www.youtube.com/watch?v=Laa93Wj7f-I
 //Orginal Code: https://racheldebarros.com/connect-your-game-controller-to-an-esp32/
@@ -13,13 +14,14 @@
 
 //PIN CONNECTIONS
 
-int ledPin = 2;
-int ENApin = 14; // motor 1 speed
-int IN1pin = 27; // motor 1 dir1
-int IN2pin = 27; // motor 1 dir2
-int IN3pin = 27; // motor 2 dir1
-int IN4pin = 27; // motor 2 dir2
-int ENBpin = 14; // motor 2 speed
+int ledPin1 = 20; //green LED A-button
+int ledPin2 = 21; //red LED B-button
+int ENApin = 4; // motor 1 speed
+int IN1pin = 5; // motor 1 dir1
+int IN2pin = 6; // motor 1 dir2
+int IN3pin = 7; // motor 2 dir1
+int IN4pin = 8; // motor 2 dir2
+int ENBpin = 9; // motor 2 speed
 int xServoPin = 12;
 int yServoPin = 13;
 
@@ -102,19 +104,21 @@ void processGamepad(ControllerPtr ctl) {
   //== XBOX A button = 0x0001 ==//
   if (ctl->buttons() == 0x0001) {
     // code for when A button is pushed
-    digitalWrite(ledPin, HIGH);
+    digitalWrite(ledPin1, HIGH);
   }
   if (ctl->buttons() != 0x0001) {
     // code for when A button is released
-    digitalWrite(ledPin, LOW);
+    digitalWrite(ledPin1, LOW);
   }
 
   //== XBOX B button = 0x0002 ==//
   if (ctl->buttons() == 0x0002) {
     // code for when B button is pushed
+     digitalWrite(ledPin2, HIGH);
   }
   if (ctl->buttons() != 0x0002) {
     // code for when B button is released
+     digitalWrite(ledPin2, LOW);
   }
 
   //== XBOX X button = 0x0004 ==//
@@ -283,7 +287,8 @@ void processControllers() {
 
 // Arduino setup function. Runs in CPU 1
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  pinMode(ledPin1, OUTPUT);
+  pinMode(ledPin2, OUTPUT);
   pinMode(IN1pin, OUTPUT);
   pinMode(IN2pin, OUTPUT);
   pinMode(ENApin, OUTPUT);
