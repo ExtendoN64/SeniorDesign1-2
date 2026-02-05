@@ -10,7 +10,7 @@
 //Orginal Code: https://racheldebarros.com/connect-your-game-controller-to-an-esp32/
 
 #include <Bluepad32.h>
-#include <ESP32Sero.h>
+#include <ESP32Servo.h>
 
 //PIN CONNECTIONS
 
