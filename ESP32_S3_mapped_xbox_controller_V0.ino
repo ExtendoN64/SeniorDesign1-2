@@ -1,4 +1,4 @@
-//still need to add more motors and need to set up for mecanum wheels.
+//Work on connecting all servos for arm.
 //Creator: GENE
 //Project: ARIES
 //Date:2/5/2026
@@ -14,19 +14,15 @@
 #include <ESP32Servo.h>
 
 //PIN CONNECTIONS
-
 int ledPin1 = 20; //green LED A-button
 int ledPin2 = 19; //red LED B-button
 
 int IN1_FL = 5; // motor 1 dir1 
 int IN2_FL = 4; // motor 1 dir2
-
 int IN1_RL = 6; // motor 2 dir1
 int IN2_RL = 7; // motor 2 dir2
-
 int IN1_FR = 16; // motor 3 dir1 
 int IN2_FR = 15; // motor 3 dir2
-
 int IN1_RR = 17; // motor 4 dir1
 int IN2_RR = 18; // motor 4 dir2
 
