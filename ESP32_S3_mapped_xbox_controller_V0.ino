@@ -5,6 +5,7 @@
 //Board: ESP32-S3
 //About: A basic code to map xbox controller buttons for functions.
 //Edit: updating pins-2/5/2026
+//    Currently working on CeeCee's frame. Auto Connects to Controller
 
 //Ripped from https://www.youtube.com/watch?v=Laa93Wj7f-I
 //Orginal Code: https://racheldebarros.com/connect-your-game-controller-to-an-esp32/
@@ -16,12 +17,19 @@
 
 int ledPin1 = 20; //green LED A-button
 int ledPin2 = 19; //red LED B-button
-int ENApin = 4; // motor 1 speed
-int IN1pin = 5; // motor 1 dir1
-int IN2pin = 6; // motor 1 dir2
-int IN3pin = 7; // motor 2 dir1
-int IN4pin = 8; // motor 2 dir2
-int ENBpin = 9; // motor 2 speed
+
+int IN1_FL = 5; // motor 1 dir1 
+int IN2_FL = 4; // motor 1 dir2
+
+int IN1_RL = 6; // motor 2 dir1
+int IN2_RL = 7; // motor 2 dir2
+
+int IN1_FR = 16; // motor 3 dir1 
+int IN2_FR = 15; // motor 3 dir2
+
+int IN1_RR = 17; // motor 4 dir1
+int IN2_RR = 18; // motor 4 dir2
+
 int xServoPin = 12;
 int yServoPin = 13;
 
@@ -188,6 +196,10 @@ void processGamepad(ControllerPtr ctl) {
   //== XBOX R1 trigger button = 0x0020 ==//
   if (ctl->buttons() == 0x0020) {
     // code for when R1 button is pushed
+    digitalWrite(IN1_FL, LOW);  digitalWrite(IN2_FL, HIGH);
+    digitalWrite(IN1_RL, HIGH);  digitalWrite(IN2_RL, LOW);
+    digitalWrite(IN1_FR, LOW);  digitalWrite(IN2_FR, HIGH);   
+    digitalWrite(IN1_RR, HIGH);  digitalWrite(IN2_RR, LOW);
   }
   if (ctl->buttons() != 0x0020) {
     // code for when R1 button is released
@@ -204,6 +216,10 @@ void processGamepad(ControllerPtr ctl) {
   //== XBOX L1 trigger button = 0x0010 ==//
   if (ctl->buttons() == 0x0010) {
     // code for when L1 button is pushed
+    digitalWrite(IN1_FL, HIGH);  digitalWrite(IN2_FL, LOW);
+    digitalWrite(IN1_RL, LOW);  digitalWrite(IN2_RL, HIGH);
+    digitalWrite(IN1_FR, HIGH);  digitalWrite(IN2_FR, LOW);   
+    digitalWrite(IN1_RR, LOW);  digitalWrite(IN2_RR, HIGH);
   }
   if (ctl->buttons() != 0x0010) {
     // code for when L1 button is released
@@ -217,59 +233,63 @@ void processGamepad(ControllerPtr ctl) {
     // code for when L2 button is released
   }
 
+    //== THROTTLE L2 ==//  Rotate ClounterClockWise!
+  if (ctl->throttle() >= 25) {
+    // code for when L2 is Pressed
+    int motorSpeed = map(ctl->throttle(), 25, 1023, 0, 255);
+    digitalWrite(IN1_FL, motorSpeed);  digitalWrite(IN2_FL, LOW);
+    digitalWrite(IN1_RL, motorSpeed);  digitalWrite(IN2_RL, LOW);
+    digitalWrite(IN1_FR, LOW);  digitalWrite(IN2_FR, motorSpeed);   
+    digitalWrite(IN1_RR, LOW);  digitalWrite(IN2_RR, motorSpeed);
+    }
+
+        //== THROTTLE R2 ==//  Rotate ClockWise!
+  if (ctl->brake() >= 25) {
+    // code for when R2 is Pressed
+    int motorSpeed = map(ctl->brake(), 25, 1023, 0, 255);    
+    digitalWrite(IN1_FL, LOW);  digitalWrite(IN2_FL, motorSpeed);
+    digitalWrite(IN1_RL, LOW);  digitalWrite(IN2_RL, motorSpeed);
+    digitalWrite(IN1_FR, motorSpeed);  digitalWrite(IN2_FR, LOW);   
+    digitalWrite(IN1_RR, motorSpeed);  digitalWrite(IN2_RR, LOW);
+    }
+
   //== LEFT JOYSTICK - UP ==//  Foward movement!
   if (ctl->axisY() <= -25) {
     // code for when left joystick is pushed up
-    int motorSpeed = map(ctl->axisY(), -25, -512, 70, 255);
-    digitalWrite(IN1pin, HIGH);
-    digitalWrite(IN2pin, LOW);
-    digitalWrite(IN3pin, HIGH);
-    digitalWrite(IN4pin, LOW);
-    digitalWrite(ENApin, motorSpeed);
-    digitalWrite(ENBpin, motorSpeed);
+    int motorSpeed = map(ctl->axisY(), -25, -512, 0, 255);
+    digitalWrite(IN1_FL, motorSpeed);  digitalWrite(IN2_FL, LOW);
+    digitalWrite(IN1_RL, motorSpeed);  digitalWrite(IN2_RL, LOW);
+    digitalWrite(IN1_FR, motorSpeed);  digitalWrite(IN2_FR, LOW);   
+    digitalWrite(IN1_RR, motorSpeed);  digitalWrite(IN2_RR, LOW);
     }
 
   //== LEFT JOYSTICK - DOWN ==// Reverse!!
   if (ctl->axisY() >= 25) {
     // code for when left joystick is pushed down
-    int motorSpeed = map(ctl->axisY(), 25, 511, 70, 255);
-    digitalWrite(IN1pin, LOW);
-    digitalWrite(IN2pin, HIGH);
-    digitalWrite(IN3pin, LOW);
-    digitalWrite(IN4pin, HIGH);
-    digitalWrite(ENApin, motorSpeed);
-    digitalWrite(ENBpin, motorSpeed);
-  }
+    int motorSpeed = map(ctl->axisY(), 25, 511, 0, 255);
+    digitalWrite(IN1_FL, LOW);  digitalWrite(IN2_FL, motorSpeed);
+    digitalWrite(IN1_RL, LOW);  digitalWrite(IN2_RL, motorSpeed);
+    digitalWrite(IN1_FR, LOW);  digitalWrite(IN2_FR, motorSpeed);   
+    digitalWrite(IN1_RR, LOW);  digitalWrite(IN2_RR, motorSpeed);
+   }
 
   //== LEFT JOYSTICK - LEFT ==//  Strafe Left
   if (ctl->axisX() <= -25) {
     // code for when left joystick is pushed left
-    int motorSpeed = map(ctl->axisX(), -25, -512, 70, 255);
-    digitalWrite(IN1pin, LOW);
-    digitalWrite(IN2pin, LOW);
-    digitalWrite(IN3pin, HIGH);
-    digitalWrite(IN4pin, LOW);
-    digitalWrite(ENApin, 0);
-    digitalWrite(ENBpin, motorSpeed);
   }
 
   //== LEFT JOYSTICK - RIGHT ==//  Strafe Right
   if (ctl->axisX() >= 25) {
     // code for when left joystick is pushed right
-    int motorSpeed = map(ctl->axisX(), 25, 511, 70, 255);
-    digitalWrite(IN1pin, HIGH);
-    digitalWrite(IN2pin, LOW);
-    digitalWrite(IN3pin, LOW);
-    digitalWrite(IN4pin, LOW);
-    digitalWrite(ENApin, motorSpeed);
-    digitalWrite(ENBpin, 0);
   }
 
-  //== LEFT JOYSTICK DEADZONE ==//
-  if (ctl->axisY() > -25 && ctl->axisY() < 25 && ctl->axisX() > -25 && ctl->axisX() < 25) {
+  //== LEFT JOYSTICK DEADZONE ==// Stop All Motors
+  if (ctl->axisY() > -25 && ctl->axisY() < 25 && ctl->axisX() > -25 && ctl->axisX() < 25 && ctl->throttle() < 25 && ctl->brake() < 25 && ctl->buttons() == 0x0000) {
     // code for when left joystick is at idle
-    analogWrite(ENApin, 0);
-    analogWrite(ENBpin, 0);
+    digitalWrite(IN1_FL, LOW);  digitalWrite(IN2_FL, LOW);
+    digitalWrite(IN1_RL, LOW);  digitalWrite(IN2_RL, LOW);
+    digitalWrite(IN1_FR, LOW);  digitalWrite(IN2_FR, LOW);   
+    digitalWrite(IN1_RR, LOW);  digitalWrite(IN2_RR, LOW);   
   }
 
   //== RIGHT JOYSTICK - X AXIS ==//  Servo Arm!
@@ -305,12 +325,14 @@ void processControllers() {
 void setup() {
   pinMode(ledPin1, OUTPUT);
   pinMode(ledPin2, OUTPUT);
-  pinMode(IN1pin, OUTPUT);
-  pinMode(IN2pin, OUTPUT);
-  pinMode(ENApin, OUTPUT);
-  pinMode(IN3pin, OUTPUT);
-  pinMode(IN4pin, OUTPUT);
-  pinMode(ENBpin, OUTPUT);
+  pinMode(IN1_FL, OUTPUT);
+  pinMode(IN2_FL, OUTPUT);
+  pinMode(IN1_RL, OUTPUT);
+  pinMode(IN2_RL, OUTPUT);
+  pinMode(IN1_FR, OUTPUT);
+  pinMode(IN2_FR, OUTPUT);
+  pinMode(IN1_RR, OUTPUT);
+  pinMode(IN2_RR, OUTPUT);
 
   xServo.attach(xServoPin);
   yServo.attach(yServoPin);
